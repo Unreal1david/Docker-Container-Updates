@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Stop all running Docker containers
+docker stop $(docker ps -aq)
+
+# Update all Docker containers
+docker pull $(docker ps -aq)
+
+# Start all stopped Docker containers
+docker start $(docker ps -aq)

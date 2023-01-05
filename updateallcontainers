@@ -3,18 +3,26 @@
 # Get a list of all running containers
 containers=$(docker ps -aq)
 
-# Loop through the list of containers and update them
+# Loop through the list of containers and update them if necessary
 for container in $containers
 do
-  # Stop the container
-  docker stop $container
-
   # Get the image associated with the container
   image=$(docker inspect --format='{{.Config.Image}}' $container)
 
-  # Pull the latest version of the image
-  docker pull $image
+  # Check if there is a newer version of the image available
+  update_available=$(docker inspect --format '{{.Id}}: {{.RepoTags}}' $image | grep -o ':[^:]*latest')
+  if [ ! -z "$update_available" ]; then
+    # Stop the container
+    docker stop $container
 
-  # Start the container using the updated image
-  docker start $container
+    # Pull the latest version of the image
+    docker pull $image
+
+    # Remove the old image
+    docker rmi $image
+
+    # Start the container using the updated image
+    docker start $container
+  fi
 done
+

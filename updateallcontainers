@@ -1,10 +1,20 @@
 #!/bin/bash
 
-# Stop all running Docker containers
-docker stop $(docker ps -aq)
+# Get a list of all running containers
+containers=$(docker ps -aq)
 
-# Update all Docker containers
-docker pull $(docker ps -aq)
+# Loop through the list of containers and update them
+for container in $containers
+do
+  # Stop the container
+  docker stop $container
 
-# Start all stopped Docker containers
-docker start $(docker ps -aq)
+  # Get the image associated with the container
+  image=$(docker inspect --format='{{.Config.Image}}' $container)
+
+  # Pull the latest version of the image
+  docker pull $image
+
+  # Start the container using the updated image
+  docker start $container
+done

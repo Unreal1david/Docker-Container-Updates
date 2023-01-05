@@ -19,7 +19,7 @@ do
     docker pull $image
 
     # Remove the old image
-    docker rmi $image
+    docker rmi -f $image
 
     # Start the container using the updated image
     docker start $container
